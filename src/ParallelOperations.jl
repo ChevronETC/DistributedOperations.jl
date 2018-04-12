@@ -40,8 +40,8 @@ function bcast(x::AbstractArray{T,N}, pids=procs()) where {T,N}
     m = 2^L
     R = M - m
 
-    futures = Dict(pids[1]=>Future())
-    put!(futures[pids[1]], x)
+    _f(x) = x
+    futures = Dict(pids[1]=>remotecall(_f, myid(), x))
 
     if R != 0
         @sync for i = 1:R

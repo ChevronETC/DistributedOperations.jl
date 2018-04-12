@@ -1,6 +1,6 @@
 using PBSMan
 cman = PBSManager()
-addprocs(cman, 127, jobgroup="jg_n28_384_none_NEX_gsu_a")
+addprocs(cman, 16, jobgroup="jg_n28_384_none_NEX_gsu_a")
 @everywhere using ParallelOperations
 
 @everywhere myfill!(future) = begin fill!(fetch(future), 1.0); nothing; end
