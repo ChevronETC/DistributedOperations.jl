@@ -90,6 +90,10 @@ function reduce!(futures::ArrayFutures{T,N}) where {T,N}
     fetch(futures[myid()])
 end
 
-export bcast, ArrayFutures, reduce!
+using DistributedArrays
+import DistributedArrays.localpart
+localpart(futures::ArrayFutures{T,N}) where {T,N} = fetch(futures[myid()])::Array{T,N}
+
+export ArrayFutures, bcast, localpart, reduce!
 
 end
