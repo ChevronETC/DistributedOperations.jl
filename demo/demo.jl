@@ -1,7 +1,3 @@
-# ParallelOperations.jl
-Fast parallel broadcast and reduction operations for Julia using binary-tree algorithms.
-
-```julia
 addprocs(7)
 @everywhere using ParallelOperations
 
@@ -34,4 +30,3 @@ end
 y = reduce!(futures)
 
 rmprocs(workers())
-```
