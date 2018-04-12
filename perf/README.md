@@ -1,4 +1,4 @@
-I ran with `2`, `4`, `8`, `16`, `32` and `64 nodes with the following results measured in seconds,
+I ran with `2`, `4`, `8`, `16`, `32` and `64` nodes with the following results measured in seconds,
 
 |Nodes|bcast |reduce|
 |-----|------|------|
