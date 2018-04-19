@@ -28,11 +28,18 @@ end
 
 @testset "Reduce" for n in ((10,), (10,11)), T in (Float32,Float64)
     futures = ArrayFutures(T, n)
-    @everywhere myfill!(future) = begin fill!(fetch(future), π); nothing end
+    @everywhere myfill!(future) = begin rand!(fetch(future)); nothing end
     @sync for pid in procs()
         @async remotecall_fetch(myfill!, pid, futures[pid])
     end
-    @test reduce!(futures) ≈ ones(n)*π*nprocs()
+    expected = zeros(T,n)
+    for pid in procs()
+        expected .+= remotecall_fetch(fetch, pid, futures[pid])
+    end
+    for pid in procs()
+        fetch(futures[pid])
+    end
+    @test reduce!(futures) ≈ expected
 end
 
 @testset "localpart" for n in ((10,), (10,11)), T in (Float32,Float64)

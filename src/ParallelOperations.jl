@@ -63,7 +63,7 @@ end
 
 function reduce!(futures::ArrayFutures{T,N}) where {T,N}
     function _reduce!(future_mine, future_theirs, T::DataType, N::Int)
-        x = fetch(future_theirs)::Array{T,N}
+        x = remotecall_fetch(fetch, future_theirs.where, future_theirs)::Array{T,N}
         y = fetch(future_mine)::Array{T,N}
         y .+= x
         nothing
