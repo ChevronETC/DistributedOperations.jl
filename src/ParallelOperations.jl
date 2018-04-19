@@ -87,12 +87,38 @@ function reduce!(futures::ArrayFutures{T,N}) where {T,N}
             @async remotecall_fetch(_reduce!, pids[i], futures[pids[i]], futures[pids[m+i]], T, N)
         end
     end
-    fetch(futures[myid()])
+    fetch(futures[myid()])::Array{T,N}
+end
+
+function Base.copy!(to::ArrayFutures, from::ArrayFutures, pids=procs())
+    function _copy!(future_to, future_from)
+        x = fetch(future_to)
+        y = fetch(future_from)
+        x .= y
+        nothing
+    end
+    @sync for pid in pids
+        @async pid ∈ keys(to) && pid ∈ keys(from) && remotecall_fetch(_copy!, pid, to[pid], from[pid])
+    end
+end
+
+function Base.fill!(futures::ArrayFutures, a::Number, pids=Int[])
+    pids = isempty(pids) ? keys(futures) : pids
+    function _fill!(future, a)
+        x = fetch(future)
+        x .= a
+        nothing
+    end
+    @sync for pid in pids
+        @async remotecall_fetch(_fill!, pid, futures[pid], a)
+    end
 end
 
 using DistributedArrays
 import DistributedArrays.localpart
 localpart(futures::ArrayFutures{T,N}) where {T,N} = fetch(futures[myid()])::Array{T,N}
+
+Base.show(io::IO, futures::ArrayFutures) = write(io, "ArrayFutures with pids=$(keys(futures)) and size $(size(localpart(futures)))")
 
 export ArrayFutures, bcast, localpart, reduce!
 
