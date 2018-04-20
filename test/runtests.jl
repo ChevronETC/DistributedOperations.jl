@@ -52,3 +52,41 @@ end
         @test remotecall_fetch(localpart, pid, futures) ≈ pid*π*ones(T,n)
     end
 end
+
+@testset "copy!" for n in ((10,), (10,11)), T in (Float32,Float64)
+    futures = ArrayFutures(T,n)
+    @everywhere myfill!(future) = begin fill!(fetch(future), myid()*π); nothing end
+    @sync for pid in procs()
+        @async remotecall_fetch(myfill!, pid, futures[pid])
+    end
+    futures_copy = ArrayFutures(T,n)
+    copy!(futures_copy, futures)
+    for pid in procs()
+        @test remotecall_fetch(localpart, pid, futures_copy) ≈ pid*π*ones(T,n)
+    end
+    fill!(futures_copy, 0)
+    copy!(futures_copy, futures, [3,5])
+    for pid in procs()
+        if pid ∈ (3,5)
+            @test remotecall_fetch(localpart, pid, futures_copy) ≈ pid*π*ones(T,n)
+        else
+            @test remotecall_fetch(localpart, pid, futures_copy) ≈ zeros(T,n)
+        end
+    end
+end
+
+@testset "fill!" for n in ((10,), (10,11)), T in (Float32,Float64)
+    futures = ArrayFutures(T,n)
+    fill!(futures, π)
+    for pid in procs()
+        @test remotecall_fetch(localpart, pid, futures) ≈ π*ones(T,n)
+    end
+    fill!(futures, 2*pi, [3,5])
+    for pid in procs()
+        if pid ∈ (3,5)
+            @test remotecall_fetch(localpart, pid, futures) ≈ 2*π*ones(T,n)
+        else
+            @test remotecall_fetch(localpart, pid, futures) ≈ π*ones(T,n)
+        end
+    end
+end
