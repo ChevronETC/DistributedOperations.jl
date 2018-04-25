@@ -14,7 +14,8 @@ function stats(futures)
 end
 
 function main()
-    x = rand(div(1_000_000_000,8))
+    N = div(10_000_000_000,8)
+    x = rand(N)
     write(STDOUT, "running on $(nprocs()) processes including master\n")
     @time futures = bcast(x)
     @time observed = stats(futures)
@@ -23,7 +24,7 @@ function main()
         Test.@test _observed ≈ expected
     end
 
-    futures = ArrayFutures(Float64, (div(1_000_000_000,8),))
+    futures = ArrayFutures(Float64, (N,))
     @sync for pid in procs()
         @async remotecall_fetch(myfill!, pid, futures[pid])
     end
