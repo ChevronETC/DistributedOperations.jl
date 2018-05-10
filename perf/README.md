@@ -2,6 +2,8 @@ I ran with `2`, `4`, `8`, `16`, `32` and `64` nodes with the following results m
 
 # 1GB
 
+## NADC
+
 |Nodes|bcast |reduce|reduce normalized cost|
 |-----|------|------|----------------------|
 |2    | 2.7  | 2.4  | 1                    |
@@ -11,7 +13,20 @@ I ran with `2`, `4`, `8`, `16`, `32` and `64` nodes with the following results m
 |32   | 12.8 | 11.8 | 4.92                 |
 |64   | 16.2 | 15.0 | 6.25                 |
 
+## GCE, n1-standard-16
+
+|Nodes|bcast |reduce|reduce normalized cost|
+|-----|------|------|----------------------|
+|2    | 1.19 | 1.38 | 1                    |
+|4    | 2.13 | 2.5  | 1.81                 |
+|8    | 3.15 | 3.97 | 2.88                 |
+|16   | 4.05 | 5.48 | 3.97                 |
+|32   | 5.48 | 7.02 | 5.09                 |
+|64   | 7.62 | 8.98 | 6.51                 |
+
 # 10GB
+
+## NADC
 
 |Nodes|bcast  |reduce |reduce normalized cost|
 |-----|-------|-------|----------------------|
