@@ -13,12 +13,17 @@ function stats(futures)
     s
 end
 
-function main()
-    N = div(10_000_000_000,8)
+function main(N,report)
+    local futures,observed
     x = rand(N)
-    write(STDOUT, "running on $(nprocs()) processes including master\n")
-    @time futures = bcast(x)
-    @time observed = stats(futures)
+    if report
+        write(STDOUT, "running on $(nprocs()) processes including master\n")
+        @time futures = bcast(x)
+        @time observed = stats(futures)
+    else
+        futures = bcast(x)
+        observed = stats(futures)
+    end
     expected = mean(x)
     for _observed in observed
         Test.@test _observed ≈ expected
@@ -28,10 +33,15 @@ function main()
     @sync for pid in procs()
         @async remotecall_fetch(myfill!, pid, futures[pid])
     end
-    @time reduce!(futures)
+    if report
+        @time reduce!(futures)
+    else
+        reduce!(futures)
+    end
     Test.@test fetch(futures[myid()]) ≈ nprocs()*ones(size(x))
 end
 
-main()
+main(1,false)
+main(div(1_000_000_000,8),true)
 
 rmprocs(cman)
