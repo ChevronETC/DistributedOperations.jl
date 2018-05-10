@@ -68,9 +68,9 @@ function bcast(x::T, pids=procs()) where {T}
     TypeFutures{T}(futures)
 end
 
-@inline paralleloperations_reduce!(y, x) = (y .+= x)
+@inline paralleloperations_reduce!(y, x) = begin y .+= x; nothing end
 function reduce!(futures::TypeFutures{T}, reducemethod!::Function=paralleloperations_reduce!) where {T}
-    function _reduce!(future_mine, future_theirs, T::DataType)
+    function _reduce!(future_mine, future_theirs, reducemethod!, _T::Type{T}) where {T}
         x = remotecall_fetch(fetch, future_theirs.where, future_theirs)::T
         y = fetch(future_mine)::T
         reducemethod!(y, x)
@@ -85,44 +85,44 @@ function reduce!(futures::TypeFutures{T}, reducemethod!::Function=paralleloperat
 
     if R != 0
         @sync for i = 1:R
-            @async remotecall_fetch(_reduce!, pids[i], futures[pids[i]], futures[pids[m+i]], T)
+            @async remotecall_fetch(_reduce!, pids[i], futures[pids[i]], futures[pids[m+i]], reducemethod!, T)
         end
     end
 
     for l = L:-1:1
         m = 2^(l-1)
         @sync for i = 1:m
-            @async remotecall_fetch(_reduce!, pids[i], futures[pids[i]], futures[pids[m+i]], T)
+            @async remotecall_fetch(_reduce!, pids[i], futures[pids[i]], futures[pids[m+i]], reducemethod!, T)
         end
     end
     fetch(futures[myid()])::T
 end
 
-@inline paralleloperations_copy!(x, y) = (x .= y)
-function Base.copy!(to::TypeFutures, from::TypeFutures, copymethod!::Function, pids::AbstractArray=Int[])
+@inline paralleloperations_copy!(x, y) = begin x .= y; nothing end
+function Base.copy!(to::TypeFutures{T}, from::TypeFutures{T}, copymethod!::Function, pids::AbstractArray=Int[]) where {T}
     pids = isempty(pids) ? keys(to) : pids
-    function _copy!(future_to, future_from, copymethod!)
-        x = fetch(future_to)
-        y = fetch(future_from)
+    function _copy!(future_to, future_from, copymethod!, _T::Type{T}) where {T}
+        x = fetch(future_to)::T
+        y = fetch(future_from)::T
         copymethod!(x, y)
         nothing
     end
     @sync for pid in pids
-        @async pid ∈ keys(to) && pid ∈ keys(from) && remotecall_fetch(_copy!, pid, to[pid], from[pid], copymethod!)
+        @async pid ∈ keys(to) && pid ∈ keys(from) && remotecall_fetch(_copy!, pid, to[pid], from[pid], copymethod!, T)
     end
 end
 Base.copy!(to::TypeFutures, from::TypeFutures, pids::AbstractArray=procs()) = copy!(to, from, paralleloperations_copy!, pids)
 
-@inline paralleloperations_fill!(x, a) = (x .= a)
-function Base.fill!(futures::TypeFutures, a::Number, fillmethod!::Function, pids::AbstractArray=Int[])
+@inline paralleloperations_fill!(x, a) = begin x .= a; nothing end
+function Base.fill!(futures::TypeFutures{T}, a::Number, fillmethod!::Function, pids::AbstractArray=Int[]) where {T}
     pids = isempty(pids) ? keys(futures) : pids
-    function _fill!(future, a, fillmethod!)
-        x = fetch(future)
+    function _fill!(future, a, fillmethod!, _T::Type{T}) where {T}
+        x = fetch(future)::T
         fillmethod!(x,a)
         nothing
     end
     @sync for pid in pids
-        @async remotecall_fetch(_fill!, pid, futures[pid], a, fillmethod!)
+        @async remotecall_fetch(_fill!, pid, futures[pid], a, fillmethod!, T)
     end
 end
 Base.fill!(futures::TypeFutures, a::Number, pids::AbstractArray=Int[]) = fill!(futures, a, paralleloperations_fill!, pids)
