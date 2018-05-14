@@ -36,7 +36,7 @@ end
 TypeFutures(x::T, f::Function, fargs::Vararg) where {T} = TypeFutures(x, f, pids, fargs...)
 
 ArrayFutures{T,N} = TypeFutures{Array{T,N}}
-ArrayFutures(_T::Type{T}, n::NTuple{N,Int}, pids=procs()) where {T,N} = TypeFutures(Array{T,N}, zeros, pids, T, n)
+ArrayFutures(_T::Type{T}, n::NTuple{N,I}, pids=procs()) where {T,N,I<:Integer} = TypeFutures(Array{T,N}, zeros, pids, T, n)
 ArrayFutures(x::Array{T,N}, pids=procs()) where {T,N} = TypeFutures(x, zeros, pids, T, size(x))
 
 function bcast(x::T, pids=procs()) where {T}
