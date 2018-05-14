@@ -98,13 +98,13 @@ function reduce!(futures::TypeFutures{T}, reducemethod!::Function=paralleloperat
     fetch(futures[myid()])::T
 end
 
-@inline paralleloperations_copy!(x, y) = begin x .= y; nothing end
+@inline paralleloperations_copy!(y, x) = begin y .= x; nothing end
 function Base.copy!(to::TypeFutures{T}, from::TypeFutures{T}, copymethod!::Function, pids::AbstractArray=Int[]) where {T}
     pids = isempty(pids) ? keys(to) : pids
     function _copy!(future_to, future_from, copymethod!, _T::Type{T}) where {T}
-        x = fetch(future_to)::T
-        y = fetch(future_from)::T
-        copymethod!(x, y)
+        y = fetch(future_to)::T
+        x = fetch(future_from)::T
+        copymethod!(y, x)
         nothing
     end
     @sync for pid in pids
