@@ -44,22 +44,23 @@ function bcast(x::T, pids=procs()) where {T}
 
     M = length(pids)
     L = round(Int,log2(prevpow2(M)))
-    m = 2^L
-    R = M - m
 
     _f(x) = x
     futures = Dict(pids[1]=>remotecall(_f, myid(), x))
 
-    if R != 0
-        @sync for i = 1:R
-            futures[pids[i+m]] = remotecall(fetch, pids[i+m], futures[pids[1]])
+    for l = 1:L
+        m = 2^(l-1)
+        @sync for i = 1:m
+            futures[pids[i+m]] = remotecall(fetch, pids[i+m], futures[pids[i]])
             @async remotecall_fetch(wait, pids[i+m], futures[pids[i+m]])
         end
     end
 
-    for l = 1:L
-        m = 2^(l-1)
-        @sync for i = 1:m
+    m = 2^L
+    R = M - m
+
+    if R != 0
+        @sync for i = 1:R
             futures[pids[i+m]] = remotecall(fetch, pids[i+m], futures[pids[i]])
             @async remotecall_fetch(wait, pids[i+m], futures[pids[i+m]])
         end
