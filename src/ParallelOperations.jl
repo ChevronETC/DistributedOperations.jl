@@ -33,7 +33,7 @@ function TypeFutures(x::T, f::Function, pids::AbstractArray, fargs::Vararg) wher
     end
     TypeFutures{T}(futures)
 end
-TypeFutures(x::T, f::Function, fargs::Vararg) where {T} = TypeFutures(x, f, pids, fargs...)
+TypeFutures(x::T, f::Function, fargs::Vararg) where {T} = TypeFutures(x, f, procs(), fargs...)
 
 ArrayFutures{T,N} = TypeFutures{Array{T,N}}
 ArrayFutures(_T::Type{T}, n::NTuple{N,I}, pids=procs()) where {T,N,I<:Integer} = TypeFutures(Array{T,N}, zeros, pids, T, n)
