@@ -21,7 +21,6 @@ TypeFutures(_T::Type{T}, f::Function, fargs::Vararg) where {T} = TypeFutures(_T,
 
 function TypeFutures(x::T, f::Function, pids::AbstractArray, fargs::Vararg) where {T}
     futures = Dict()
-    n = size(x)
     @sync for pid in pids
         if pid == myid()
             futures[pid] = Future()
