@@ -1,6 +1,6 @@
+using Distributed
 addprocs(6)
-using Base.Test
-@everywhere using ParallelOperations
+@everywhere using Distributed, ParallelOperations, Random, Test
 
 @testset "Construction" for n in ((10,), (10,11)), T in (Float32,Float64)
     x = ones(T,n)
