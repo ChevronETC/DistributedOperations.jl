@@ -1,3 +1,4 @@
-julia v0.6
+julia v0.7
 
+Distributed
 DistributedArrays

@@ -1,6 +1,6 @@
-__precompile__(true)
-
 module ParallelOperations
+
+using Distributed
 
 struct TypeFutures{T} f::Dict{Int,Future} end
 Base.getindex(a::TypeFutures, i::Int) = getindex(a.f, i)
@@ -21,7 +21,6 @@ TypeFutures(_T::Type{T}, f::Function, fargs::Vararg) where {T} = TypeFutures(_T,
 
 function TypeFutures(x::T, f::Function, pids::AbstractArray, fargs::Vararg) where {T}
     futures = Dict()
-    n = size(x)
     @sync for pid in pids
         if pid == myid()
             futures[pid] = Future()
@@ -43,7 +42,7 @@ function bcast(x::T, pids=procs()) where {T}
     pids[1] == myid() || error("expected myid()==pids[1], got pids[1]=$(pids[1]) where-as myid()=$(myid())")
 
     M = length(pids)
-    L = round(Int,log2(prevpow2(M)))
+    L = round(Int,log2(prevpow(2,M)))
 
     _f(x) = x
     futures = Dict(pids[1]=>remotecall(_f, myid(), x))
@@ -80,7 +79,7 @@ function reduce!(futures::TypeFutures{T}, reducemethod!::Function=paralleloperat
 
     pids = sort(collect(keys(futures)))
     M = length(pids)
-    L = round(Int,log2(prevpow2(M)))
+    L = round(Int,log2(prevpow(2,M)))
     m = 2^L
     R = M - m
 

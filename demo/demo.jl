@@ -1,3 +1,4 @@
+using Distributed
 addprocs(7)
 @everywhere using ParallelOperations
 
