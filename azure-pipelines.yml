@@ -10,6 +10,7 @@ steps:
     mkdir -p /home/vsts/.julia/dev
     cp -r ${BUILD_SOURCESDIRECTORY} /home/vsts/.julia/dev/ParallelOperations
     export PATH="$PATH:/opt/julia/bin"
+    echo export PATH="$PATH:/opt/julia/bin" >> /home/vsts/.bashrc
 
     julia -e 'using Pkg; pkg"add Distributed"'
     julia -e 'using Pkg; pkg"develop --local /home/vsts/.julia/dev/ParallelOperations"'
@@ -17,5 +18,6 @@ steps:
   displayName: 'Install system'
   
 - script: |
+    echo $PATH
     julia -e 'using Pkg; pkg"test ParallelOperations"'
   displayName: 'Run unit-tests'
