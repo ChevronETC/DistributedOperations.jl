@@ -14,5 +14,8 @@ steps:
     julia -e 'using Pkg; pkg"add Distributed"'
     julia -e 'using Pkg; pkg"develop --local /home/vsts/.julia/dev/ParallelOperations"'
     julia -e 'using Pkg; pkg"precompile"'
+  displayName: 'Install system'
+  
+- script: |
     julia -e 'using Pkg; pkg"test ParallelOperations"'
   displayName: 'Run unit-tests'
