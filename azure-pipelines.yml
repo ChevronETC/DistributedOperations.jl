@@ -16,6 +16,5 @@ steps:
   displayName: 'Install system'
   
 - script: |
-    echo $PATH
     /opt/julia/bin/julia -e 'using Pkg; pkg"test ParallelOperations"'
   displayName: 'Run unit-tests'
