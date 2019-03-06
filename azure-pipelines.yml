@@ -3,6 +3,7 @@ pool:
 
 variables:
   - group: GCPStorage
+
 steps:
 - task: DownloadSecureFile@1
   inputs:
@@ -16,7 +17,6 @@ steps:
   inputs:
     secureFile: known_hosts
 
-steps:
 - script: |
     mkdir ~/.ssh
     cp $(Agent.TempDirectory)/id_rsa ~/.ssh/id_rsa
