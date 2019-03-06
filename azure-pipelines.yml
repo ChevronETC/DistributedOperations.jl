@@ -41,7 +41,7 @@ steps:
 
     /opt/julia/bin/julia -e 'using Pkg; pkg"instantiate"'
     /opt/julia/bin/julia -e 'using Pkg; pkg"add Distributed"'
-    /opt/julia/bin/julia -e 'using Pkg; pkg"develop --local $(HOME)/ParallelOperations"'
+    /opt/julia/bin/julia -e 'using Pkg; pkg"develop --local $(HOME)/.julia/dev/ParallelOperations"'
     /opt/julia/bin/julia -e 'using Pkg; pkg"precompile"'
   env:
     MYJULIA_VERSION: $(JULIA_VERSION)
