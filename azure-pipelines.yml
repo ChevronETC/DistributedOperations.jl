@@ -1,20 +1,68 @@
 pool:
   vmImage: 'Ubuntu 16.04'
 
+variables:
+  - group: GCPStorage
+steps:
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: id_rsa
+
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: id_rsa.pub
+
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: known_hosts
+
 steps:
 - script: |
-    sudo wget https://julialang-s3.julialang.org/bin/linux/x64/1.1/julia-1.1.0-linux-x86_64.tar.gz
+    mkdir ~/.ssh
+    cp $(Agent.TempDirectory)/id_rsa ~/.ssh/id_rsa
+    cp $(Agent.TempDirectory)/id_rsa.pub ~/.ssh/id_rsa.pub
+    cp $(Agent.TempDirectory)/known_hosts ~/.ssh/known_hosts
+    chmod 600 ~/.ssh/id_rsa
+    chmod 644 ~/.ssh/id_rsa.pub
+    chmod 644 ~/.ssh/known_hosts
+
+    MYJULIA_VERSION_MINOR=`echo ${MYJULIA_VERSION} | sed 's/\.[^.]*$//'`
+
+    sudo wget https://julialang-s3.julialang.org/bin/linux/x64/${MYJULIA_VERSION_MINOR}/julia-${MYJULIA_VERSION}-linux-x86_64.tar.gz
     sudo mkdir -p /opt/julia
-    sudo tar --strip-components=1 -xzvf julia-1.1.0-linux-x86_64.tar.gz -C /opt/julia
-    
+    sudo tar --strip-components=1 -xzvf julia-${MYJULIA_VERSION}-linux-x86_64.tar.gz -C /opt/julia
+
+    sudo wget https://releases.hashicorp.com/packer/${MYPACKER_VERSION}/packer_${MYPACKER_VERSION}_linux_amd64.zip
+    sudo mkdir -p /opt/packer
+    sudo unzip packer_${MYPACKER_VERSION}_linux_amd64.zip -d /opt/packer
+
     mkdir -p $(HOME)/.julia/dev
     cp -r ${BUILD_SOURCESDIRECTORY} $(HOME)/.julia/dev/ParallelOperations
-    
+
+    /opt/julia/bin/julia -e 'using Pkg; pkg"instantiate"'
     /opt/julia/bin/julia -e 'using Pkg; pkg"add Distributed"'
-    /opt/julia/bin/julia -e 'using Pkg; pkg"develop --local $(HOME)/.julia/dev/ParallelOperations"'
+    /opt/julia/bin/julia -e 'using Pkg; pkg"develop --local $(HOME)/ParallelOperations"'
     /opt/julia/bin/julia -e 'using Pkg; pkg"precompile"'
+  env:
+    MYJULIA_VERSION: $(JULIA_VERSION)
+    MYPACKER_VERSION: $(PACKER_VERSION)
   displayName: 'Install system'
-  
-- script: |
+
+- script:
     /opt/julia/bin/julia -e 'using Pkg; pkg"test ParallelOperations"'
   displayName: 'Run unit-tests'
+
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: account.json
+
+- script: |
+    git clone chevron@vs-ssh.visualstudio.com:v3/chevron/ETC-ESD-jcloud/jcloud /tmp/jcloud
+    cd /tmp/jcloud
+    cp $(HOME)/.ssh/id_rsa ./ssh/id_rsa
+    cp $(HOME)/.ssh/id_rsa.pub ./ssh/id_rsa.pub
+    cp $(HOME)/.ssh/known_hosts ./ssh/known_hosts
+    cp $(Agent.TempDirectory)/account.json ./account.json
+    /opt/packer/packer build --force jcloud.json
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  displayName: 'Deploy to Google Cloud Platform'
