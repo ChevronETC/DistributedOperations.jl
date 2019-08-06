@@ -13,6 +13,18 @@ I ran with `2`, `4`, `8`, `16`, `32` and `64` nodes with the following results m
 |32   | 12.8 | 11.8 | 4.92                 |
 |64   | 16.2 | 15.0 | 6.25                 |
 
+## NADC (Intel MPI, untuned)
+[Alex: the scling of reduce is WAY too good]
+
+|Nodes|bcast |reduce|reduce normalized cost|
+|-----|------|------|----------------------|
+|2    | 2.0  | 1.1  | 1                    |
+|4    | 2.9  | 1.4  | 1.23                 |
+|8    | 3.6  | 2.0  | 1.70                 |
+|16   | 3.7  | 2.1  | 1.79                 |
+|32   | 6.1  | 4.4  | 3.74                 |
+|64   | 7.6  | 6.0  | 5.18                 |
+
 ## GCE, n1-standard-16
 
 |Nodes|bcast |reduce|reduce normalized cost|
