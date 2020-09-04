@@ -38,6 +38,13 @@ ArrayFutures{T,N} = TypeFutures{Array{T,N}}
 ArrayFutures(_T::Type{T}, n::NTuple{N,I}, pids=procs()) where {T,N,I<:Integer} = TypeFutures(Array{T,N}, zeros, pids, T, n)
 ArrayFutures(x::Array{T,N}, pids=procs()) where {T,N} = TypeFutures(x, zeros, pids, T, size(x))
 
+function bcast!(x::TypeFutures{T}, pids) where {T}
+    _pids = 1 ∈ pids ? pids : [1;pids]
+    _x = bcast(localpart(x)::T, _pids)
+    merge!(x.f, _x.f)
+    x
+end
+
 function bcast(x::T, pids=procs()) where {T}
     pids[1] == myid() || error("expected myid()==pids[1], got pids[1]=$(pids[1]) where-as myid()=$(myid())")
 
@@ -134,6 +141,6 @@ localpart(futures::TypeFutures{T}) where {T} = fetch(futures[myid()])::T
 Base.show(io::IO, futures::TypeFutures) = write(io, "TypeFutures with pids=$(keys(futures)) and type $(typeof(localpart(futures)))")
 Base.show(io::IO, futures::ArrayFutures) = write(io, "ArrayFutures with pids=$(keys(futures)) and type $(size(localpart(futures)))")
 
-export ArrayFutures, TypeFutures, bcast, localpart, reduce!
+export ArrayFutures, TypeFutures, bcast, bcast!, localpart, reduce!
 
 end

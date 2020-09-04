@@ -35,6 +35,17 @@ end
     end
 end
 
+@testset "In-place broadcast" for n in ((10,), (10,11)), T in (Float32,Float64)
+    x = rand(T,n)
+    futures = bcast(x)
+    wrkrs = addprocs(2)
+    bcast!(futures, wrkrs)
+    for pid in procs()
+        @test fetch(futures[pid]) ≈ x
+    end
+    rmprocs(wrkrs)
+end
+
 @testset "Reduce, array" for n in ((10,), (10,11)), T in (Float32,Float64)
     futures = ArrayFutures(T, n)
     @everywhere myfill!(future) = begin rand!(fetch(future)); nothing end
