@@ -1,4 +1,4 @@
-module ParallelOperations
+module DistributedOperations
 
 using Distributed
 
