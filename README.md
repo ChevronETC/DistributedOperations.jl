@@ -1,4 +1,4 @@
-# ParallelOperations.jl
+# DistributedOperations.jl
 Fast parallel broadcast and reduction operations for Julia using binary-tree algorithms.  Note that
 we can broadcast and reduce over any Julia type, but we provide convenience methods for performing
 these operations on Julia arrays.
@@ -7,7 +7,7 @@ these operations on Julia arrays.
 
 ```julia
 addprocs(7)
-@everywhere using ParallelOperations
+@everywhere using DistributedOperations
 
 x = ones(10)
 
@@ -44,7 +44,7 @@ rmprocs(workers())
 For generic types, we provide custom reduction and copy methods.  For example,
 ```julia
 addprocs(7)
-@everywhere using ParallelOperations
+@everywhere using DistributedOperations
 
 @everywhere struct B
 	x::Vector{Float64}

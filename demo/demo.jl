@@ -1,6 +1,6 @@
 using Distributed
 addprocs(7)
-@everywhere using ParallelOperations
+@everywhere using DistributedOperations
 
 x = ones(10)
 

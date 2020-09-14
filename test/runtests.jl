@@ -1,6 +1,6 @@
 using Distributed
 addprocs(6)
-@everywhere using Distributed, ParallelOperations, Random, Test
+@everywhere using Distributed, DistributedOperations, Random, Test
 
 @testset "Construction" for n in ((10,), (10,11)), T in (Float32,Float64)
     x = ones(T,n)

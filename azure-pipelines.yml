@@ -2,7 +2,7 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 variables:
-  - group: ParallelOperations
+  - group: DistributedOperations
 
 steps:
 - task: DownloadSecureFile@1
@@ -37,11 +37,11 @@ steps:
     sudo unzip packer_${MYPACKER_VERSION}_linux_amd64.zip -d /opt/packer
 
     mkdir -p $(HOME)/.julia/dev
-    cp -r ${BUILD_SOURCESDIRECTORY} $(HOME)/.julia/dev/ParallelOperations
+    cp -r ${BUILD_SOURCESDIRECTORY} $(HOME)/.julia/dev/DistributedOperations
 
     /opt/julia/bin/julia -e 'using Pkg; pkg"instantiate"'
     /opt/julia/bin/julia -e 'using Pkg; pkg"add Distributed"'
-    /opt/julia/bin/julia -e 'using Pkg; pkg"develop --local $(HOME)/.julia/dev/ParallelOperations"'
+    /opt/julia/bin/julia -e 'using Pkg; pkg"develop --local $(HOME)/.julia/dev/DistributedOperations"'
     /opt/julia/bin/julia -e 'using Pkg; pkg"precompile"'
   env:
     MYJULIA_VERSION: $(JULIA_VERSION)
@@ -49,7 +49,7 @@ steps:
   displayName: 'Install system'
 
 - script:
-    /opt/julia/bin/julia -e 'using Pkg; pkg"test ParallelOperations"'
+    /opt/julia/bin/julia -e 'using Pkg; pkg"test DistributedOperations"'
   displayName: 'Run unit-tests'
 
 - task: DownloadSecureFile@1

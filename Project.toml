@@ -1,5 +1,5 @@
-name = "ParallelOperations"
-uuid = "1b60ccb4-57e0-5af0-9a84-4a6fb2dffe34"
+name = "DistributedOperations"
+uuid = "5333d757-b784-411c-847d-750c45219338"
 version = "1.2.0"
 
 [deps]
