@@ -3,3 +3,4 @@
 *.e*
 *.o*
 docs/build
+Manifest.toml
