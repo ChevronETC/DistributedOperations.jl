@@ -5,7 +5,7 @@
 | [![][docs-dev-img]][docs-dev-url] [![][docs-stable-img]][docs-stable-url] | [![][doc-build-status-img]][doc-build-status-url] [![][build-status-img]][build-status-url] [![][code-coverage-img]][code-coverage-results] |
 
 Fast parallel broadcast and reduction operations for Julia using binary-tree
-algorithms.  DistributedOpeatons.jl can broadcast and reduce over any Julia
+algorithms.  DistributedOperations.jl can broadcast and reduce over any Julia
 type, but we provide convenience methods for performing these operations on
 Julia arrays.
 
