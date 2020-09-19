@@ -1,4 +1,4 @@
-# AzManagers.jl contributor guidelines
+# DistributedOperations.jl contributor guidelines
 
 ## Issue reporting
 If you have found a bug in AzManagers.jl or have any suggestions for changes to
