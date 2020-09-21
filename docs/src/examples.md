@@ -23,7 +23,6 @@ rmprocs(workers())
 ```
 
 ## Reduce arrays example
-Here, we construct
 
 ```julia
 addprocs(7)
