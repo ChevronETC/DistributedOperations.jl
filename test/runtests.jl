@@ -46,6 +46,21 @@ end
     rmprocs(wrkrs)
 end
 
+@testset "In-place broadcast, type futures" begin
+    y = (x=rand(2),y=rand(2))
+    x = TypeFutures(y)
+    wrkrs = addprocs(2)
+    @everywhere using DistributedOperations
+    bcast!(x, workers())
+    _y = remotecall_fetch(localpart, workers()[1], x)
+    @test _y.x ≈ y.x
+    @test _y.y ≈ y.y
+    _y = remotecall_fetch(localpart, workers()[2], x)
+    @test _y.x ≈ y.x
+    @test _y.y ≈ y.y
+    rmprocs(wrkrs)
+end
+
 @testset "Reduce, array" for n in ((10,), (10,11)), T in (Float32,Float64)
     futures = ArrayFutures(T, n)
     @everywhere myfill!(future) = begin rand!(fetch(future)); nothing end

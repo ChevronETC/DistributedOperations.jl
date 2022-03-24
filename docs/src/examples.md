@@ -77,3 +77,26 @@ end
 futures_copy = TypeFutures(B, ()->B(zeros(10), zeros(10)))
 copy!(futures_copy, futures, copymethod!)
 ```
+
+## In-place broadcast
+It is sometimes useful to broadcast an existing `TypeFutures` to new Julia processes.  For example with an
+`ArrayFutures` we have,
+```julia
+using Distributed, DistributedOperations
+y = rand(2)
+x = ArrayFutures(y)
+addprocs(2)
+@everywhere using Distributed, DistributedOperations
+bcast!(x, workers())
+rmprocs(workers())
+```
+Second, we have an example for `TypeFutures`,
+```julia
+using Distributed, DistributedOperations
+y = (x=rand(2),y=rand(2))
+x = TypeFutures(y)
+addprocs(2)
+@everywhere using Distributed, DistributedOperations
+bcast!(x, workers())
+rmprocs(workers())
+```
