@@ -284,7 +284,12 @@ import DistributedArrays.localpart
 
 Get the piece of `x::TypeFutures` that is local to `myid()`.
 """
-localpart(futures::TypeFutures{T}) where {T} = fetch(futures[myid()])::T
+function localpart(futures::TypeFutures{T}) where {T}
+    @info "line $(@__LINE__) in $(@__FILE__), typeof(futures)=$(typeof(futures))"
+    _future = futures[myid()]
+    @info "line $(@__LINE__) in $(@__FILE__), typeof(_future)=$(typeof(_future))"
+    fetch(futures[myid()])::T
+end
 
 Base.show(io::IO, futures::TypeFutures) = write(io, "TypeFutures with pids=$(keys(futures)) and type $(typeof(localpart(futures)))")
 Base.show(io::IO, futures::ArrayFutures) = write(io, "ArrayFutures with pids=$(keys(futures)) and type $(size(localpart(futures)))")
