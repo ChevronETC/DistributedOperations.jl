@@ -287,7 +287,7 @@ Get the piece of `x::TypeFutures` that is local to `myid()`.
 localpart(futures::TypeFutures{T}) where {T} = fetch(futures[myid()])::T
 
 Base.show(io::IO, futures::TypeFutures) = write(io, "TypeFutures with pids=$(keys(futures)) and type $(typeof(localpart(futures)))")
-Base.show(io::IO, futures::ArrayFutures) = write(io, "ArrayFutures with pids=$(keys(futures)) and type $(size(localpart(futures)))")
+Base.show(io::IO, futures::ArrayFutures) = write(io, "ArrayFutures with pids=$(keys(futures)) and dimensions $(size(localpart(futures)))")
 
 export ArrayFutures, TypeFutures, bcast, bcast!, localpart, reduce!
 
